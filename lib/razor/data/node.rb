@@ -212,6 +212,7 @@ module Razor::Data
       self.hostname = ERB.new(
           policy.hostname_pattern.gsub(/\$\{\s*id\s*\}/, id.to_s)
       ).result(binding)
+      self.current_policy_count = Node.dataset.filter(:policy_id => self.policy.id).count() + 1
 
       if policy.node_metadata
         modify_metadata('no_replace' => true, 'update' => policy.node_metadata)
