@@ -236,6 +236,7 @@ describe Razor::Data::Node do
       policy.hostname_pattern = "host<%= id %>.example.org"
       policy.save
       node.bind(policy)
+      puts node.id
       node.hostname.should == "host#{node.id}.example.org"
     end
   end
