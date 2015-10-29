@@ -193,6 +193,18 @@ module Razor::Data
       return value
     end
 
+    def current_policy_count
+        current_count = Node.dataset.filter(:policy_id => self.policy.id).count()
+        (1 .. current_count).to_a.each do |current_policy_count|
+            proposed_hostname = ERB.new(self.policy.hostname_pattern).result(binding)
+            found_hosts = Node.dataset.filter(:hostname => proposed_hostname).count()
+            if found_hosts == 0
+                return current_policy_count
+            end
+        end
+        return current_count += 1
+    end
+
     def bind(policy)
       self.policy = policy
       self.boot_count = 1
@@ -212,8 +224,6 @@ module Razor::Data
       self.hostname = ERB.new(
           policy.hostname_pattern.gsub(/\$\{\s*id\s*\}/, id.to_s)
       ).result(binding)
-
-      current_policy_count = Node.dataset.filter(:policy_id => self.policy.id).count() + 1
 
       if policy.node_metadata
         modify_metadata('no_replace' => true, 'update' => policy.node_metadata)
